@@ -13,7 +13,6 @@ export default function SignIn() {
   const [password, setPassword] = useState<string>('');
 
   const onSubmit = async () => {
-    console.log('sign in clicked');
     const { user, status, error } = await Auth.login(email, password);
     if (error) {
       alert(error);
