@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { BASE_URL } from 'lib/utils/constants';
+import { mutate } from 'swr';
 
 const Auth = {
   login: async (email: string, password: string) => {
@@ -9,6 +10,7 @@ const Auth = {
       const { data, status } = await axios.post(`${BASE_URL}/users/login`, { user: { email, password } });
       if (status == 200 && data?.user) {
         window.localStorage.setItem('user', JSON.stringify(data.user));
+        mutate('user', data.user);
         user = data!.user;
         return { user, status };
       }
@@ -23,6 +25,7 @@ const Auth = {
       const { data, status } = await axios.post(`${BASE_URL}/users`, { user: { username, email, password } });
       if (status == 200) {
         window.localStorage.setItem('user', JSON.stringify(data.user));
+        mutate('user', data.user);
         return { user: data!.user, status };
       }
       return { errors: [{ message: 'Failed to register' }] };
@@ -31,4 +34,5 @@ const Auth = {
     }
   }
 };
+
 export { Auth };
