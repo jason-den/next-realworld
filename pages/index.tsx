@@ -7,6 +7,7 @@ Home page (URL: /#/ )
 */
 
 import styles from '../styles/Home.module.css';
+import Head from 'next/head';
 import Link from 'next/link';
 import { storage } from 'lib/utils/storage';
 import useSWR, { trigger } from 'swr';
@@ -25,6 +26,10 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
+      <Head>
+        <title>Register | Next Realworld</title>
+        <meta name="description" content="Welcome!" />
+      </Head>
       home page
       {urls.map((url, idx) => (
         <Link href={`/${url}`} key={idx}>
