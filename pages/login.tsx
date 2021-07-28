@@ -1,9 +1,3 @@
-/*
-Sign in/Sign up pages (URL: /#/login, /#/register )
-
-- Uses JWT (store the token in localStorage)
-- Authentication can be easily switched to session/cookie based
-*/
 import Head from 'next/head';
 import Link from 'next/link';
 import styles from 'styles/Login.module.css';
