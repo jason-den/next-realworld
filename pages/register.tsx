@@ -15,14 +15,14 @@ export default function Page() {
         <div className="row">
           <div className="col-md-6 offset-md-3 col-xs-12">
             <h1 className="text-xs-center">Sign up</h1>
-            <div className="w-100 text-center">
+            <p className="text-center">
               <Link href="/register" as="/register">
                 <a className={styles.link}>Have an account?</a>
               </Link>
-            </div>
+            </p>
+            <RegisterForm />
           </div>
         </div>
-        <RegisterForm />
       </div>
     </>
   );
