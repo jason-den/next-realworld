@@ -34,7 +34,7 @@ export function RegisterForm() {
         <input
           className="form-control form-control-lg"
           name="email"
-          type="text"
+          type="email"
           placeholder="Email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}

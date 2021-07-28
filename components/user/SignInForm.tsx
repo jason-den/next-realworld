@@ -3,7 +3,7 @@ import { Auth } from 'lib/api';
 import { useState } from 'react';
 
 export function SignInForm() {
-  // TODO: disable button during loading 
+  // TODO: disable button during loading
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
 
@@ -22,10 +22,11 @@ export function SignInForm() {
         <input
           className="form-control form-control-lg"
           name="email"
-          type="text"
+          type="email"
           placeholder="Email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)} />
+          onChange={(e) => setEmail(e.target.value)}
+        />
       </div>
       <div className="form-group">
         <input
@@ -34,7 +35,8 @@ export function SignInForm() {
           type="password"
           placeholder="Password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)} />
+          onChange={(e) => setPassword(e.target.value)}
+        />
       </div>
 
       <button className="my-2 btn btn-lg btn-primary pull-xs-right" onClick={(e) => onSubmit()}>
