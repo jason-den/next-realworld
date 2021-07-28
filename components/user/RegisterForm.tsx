@@ -3,6 +3,7 @@ import { Auth } from 'lib/api';
 import { useState } from 'react';
 
 export function RegisterForm() {
+  // TODO: disable button during loading
   const [userName, setUserName] = useState<string>('');
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
@@ -26,7 +27,8 @@ export function RegisterForm() {
           type="text"
           placeholder="User Name"
           value={userName}
-          onChange={(e) => setUserName(e.target.value)} />
+          onChange={(e) => setUserName(e.target.value)}
+        />
       </div>
       <div className="form-group">
         <input
@@ -35,7 +37,8 @@ export function RegisterForm() {
           type="text"
           placeholder="Email"
           value={email}
-          onChange={(e) => setEmail(e.target.value)} />
+          onChange={(e) => setEmail(e.target.value)}
+        />
       </div>
       <div className="form-group">
         <input
@@ -44,7 +47,8 @@ export function RegisterForm() {
           type="password"
           placeholder="Password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)} />
+          onChange={(e) => setPassword(e.target.value)}
+        />
       </div>
 
       <button className="my-2 btn btn-lg btn-primary pull-xs-right" onClick={(e) => onSubmit()}>

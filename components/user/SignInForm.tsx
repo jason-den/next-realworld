@@ -3,6 +3,7 @@ import { Auth } from 'lib/api';
 import { useState } from 'react';
 
 export function SignInForm() {
+  // TODO: disable button during loading 
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
 
