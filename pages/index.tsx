@@ -12,6 +12,7 @@ import Link from 'next/link';
 import { storage } from 'lib/utils/storage';
 import useSWR, { trigger } from 'swr';
 import { Banner } from 'components/home/Banner';
+import { checkLogin } from 'lib/utils/checkLogin';
 
 export default function Home() {
   const urls = [
@@ -23,7 +24,7 @@ export default function Home() {
     'article/aDummyArticleSlug'
   ];
   const { data: user } = useSWR('user', storage);
-  console.log(user);
+  const isLogin = checkLogin(user);
 
   return (
     <div className={styles.container}>
@@ -31,7 +32,7 @@ export default function Home() {
         <title>Register | Next Realworld</title>
         <meta name="description" content="Welcome!" />
       </Head>
-      <Banner />
+      {isLogin ? 'user already login' : <Banner />}
       <hr />
       {urls.map((url, idx) => (
         <Link href={`/${url}`} key={idx}>
