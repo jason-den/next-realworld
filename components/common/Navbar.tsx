@@ -1,15 +1,14 @@
 import React from 'react';
 import useSWR from 'swr';
 import { Maybe } from 'components/common/Maybe';
-import styles from 'styles/Home.module.css';
 import { storage } from 'lib/utils/storage';
-import Link from 'next/link';
 import { checkLogin } from 'lib/utils/checkLogin';
-import { useRouter } from 'next/router';
 import { NavItem } from './NavItem';
+import { UserInfo } from 'types';
 
 export const Navbar = () => {
-  const { data: currentUser } = useSWR('user', storage);
+  const { data } = useSWR('user', storage);
+  const currentUser: UserInfo = data;
   const isLoggedIn = checkLogin(currentUser);
 
   return (
@@ -21,6 +20,7 @@ export const Navbar = () => {
           <Maybe test={isLoggedIn}>
             <NavItem href="" icon={<i className="ion-compose" />} text="New Post" />
             <NavItem href="/settings" icon={<i className="ion-gear-a" />} text="Settings" />
+            <NavItem href={`/${currentUser?.username}`} text={currentUser?.username} />
           </Maybe>
           <Maybe test={!isLoggedIn}>
             <NavItem href="/login" text="Sign in" />
