@@ -8,7 +8,11 @@ const Auth = {
     let user = undefined;
 
     try {
-      const { data, status } = await axios.post(`${BASE_URL}/users/login`, { user: { email, password } });
+      const { data, status } = await axios.post(
+        `${BASE_URL}/users/login`,
+        { user: { email, password } },
+        { headers: { 'Access-Control-Allow-Origin': '*' } }
+      );
       if (status == 200 && data?.user) {
         window.localStorage.setItem('user', JSON.stringify(data.user));
         mutate('user', data.user);
@@ -23,7 +27,11 @@ const Auth = {
 
   signup: async (username: string, email: string, password: string) => {
     try {
-      const { data, status } = await axios.post(`${BASE_URL}/users`, { user: { username, email, password } });
+      const { data, status } = await axios.post(
+        `${BASE_URL}/users`,
+        { user: { username, email, password } },
+        { headers: { 'Access-Control-Allow-Origin': '*' } }
+      );
       if (status == 200) {
         window.localStorage.setItem('user', JSON.stringify(data.user));
         mutate('user', data.user);
@@ -41,7 +49,7 @@ const Auth = {
       const { data, status } = await axios.put(
         `${BASE_URL}/user`,
         { user },
-        { headers: { Authorization: `Token ${encodeURIComponent(token)}` } }
+        { headers: { Authorization: `Token ${encodeURIComponent(token)}`, 'Access-Control-Allow-Origin': '*' } }
       );
 
       if (status == 200) {
