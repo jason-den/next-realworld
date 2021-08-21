@@ -4,11 +4,13 @@
   height: 169px;
   padding: 30px;
 }
-.container {
-  min-height: 60vh;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: start;
-  align-items: center;
+
+.sidebar {
+  padding: 5px 10px 10px 10px;
+  background: #f3f3f3;
+  border-radius: 4px;
+}
+
+.sidebar p {
+  margin-bottom: 0.2rem;
 }
