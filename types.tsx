@@ -8,3 +8,5 @@ export type UserInfo = {
   email: string;
   password?: string;
 };
+
+export type FeedType = 'Your Feed' | 'Global Feed';
