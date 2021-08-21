@@ -1,8 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
-// TODO: issue - footer covers some content
 export const Footer = () => (
-  <footer>
+  <footer style={{ position: 'relative' }}>
     <div className="container">
       <Link href="/" passHref>
         <a className="logo-font" children="conduit" />
