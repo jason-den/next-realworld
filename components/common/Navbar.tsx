@@ -20,7 +20,7 @@ export const Navbar = () => {
           <Maybe test={isLoggedIn}>
             <NavItem href="" icon={<i className="ion-compose" />} text="New Post" />
             <NavItem href="/settings" icon={<i className="ion-gear-a" />} text="Settings" />
-            <NavItem href={`/${currentUser?.username}`} text={currentUser?.username} />
+            <NavItem href={`/profile/${encodeURIComponent(currentUser?.username)}`} text={currentUser?.username} />
           </Maybe>
           <Maybe test={!isLoggedIn}>
             <NavItem href="/login" text="Sign in" />
