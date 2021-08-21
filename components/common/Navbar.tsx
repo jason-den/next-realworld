@@ -18,7 +18,7 @@ export const Navbar = () => {
         <ul className="nav navbar-nav pull-xs-right">
           <NavItem href="/" text="Home" />
           <Maybe test={isLoggedIn}>
-            <NavItem href="" icon={<i className="ion-compose" />} text="New Post" />
+            <NavItem href="" icon={<i className="ion-compose" />} text="New Article" />
             <NavItem href="/settings" icon={<i className="ion-gear-a" />} text="Settings" />
             <NavItem href={`/profile/${encodeURIComponent(currentUser?.username)}`} text={currentUser?.username} />
           </Maybe>

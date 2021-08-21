@@ -1,6 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
-
+// TODO: issue - footer covers some content
 export const Footer = () => (
   <footer>
     <div className="container">

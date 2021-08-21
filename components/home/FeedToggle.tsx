@@ -1,34 +1,40 @@
 import React from 'react';
+import { useState, useEffect } from 'react';
 
-import { FeedType } from 'types';
+export const DefaultFeedTypes = ['Your Feed', 'Global Feed'];
 
 type FeedToggleProps = {
-  feedType: FeedType;
-  setFeedType: React.Dispatch<React.SetStateAction<FeedType>>;
+  feedType: string;
+  setFeedType: React.Dispatch<React.SetStateAction<string>>;
 };
 export const FeedToggle: React.FC<FeedToggleProps> = ({ feedType, setFeedType }) => {
+  const [feedTypes, setFeedTypes] = useState(DefaultFeedTypes);
+  const renderFeedString = (feedString: string) => {
+    if (undefined === DefaultFeedTypes.find((v) => v == feedString)) return `# ${feedString}`;
+    else return feedString;
+  };
+
+  useEffect(() => {
+    if (undefined === DefaultFeedTypes.find((v) => v == feedType)) {
+      setFeedTypes([...DefaultFeedTypes, feedType]);
+    } else {
+      setFeedTypes(DefaultFeedTypes);
+    }
+  }, [feedType]);
+
   return (
     <>
       <div className="feed-toggle">
         <ul className="nav nav-pills outline-active">
-          <li className="nav-item">
-            <a
-              className={'nav-link ' + (feedType == 'Your Feed' && 'active')}
-              onClick={() => setFeedType('Your Feed')}
-              style={{ cursor: 'pointer' }}
-            >
-              Your Feed
-            </a>
-          </li>
-          <li className="nav-item">
-            <a
-              className={'nav-link ' + (feedType == 'Global Feed' && 'active')}
-              onClick={() => setFeedType('Global Feed')}
-              style={{ cursor: 'pointer' }}
-            >
-              Global Feed
-            </a>
-          </li>
+          {feedTypes.map((item, idx) => (
+            <li className="nav-item" key={idx}>
+              <a
+                className={'nav-link ' + (feedType == item && 'active')}
+                onClick={() => setFeedType(item)}
+                children={renderFeedString(item)}
+              />
+            </li>
+          ))}
         </ul>
       </div>
     </>
