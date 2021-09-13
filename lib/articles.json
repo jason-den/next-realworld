@@ -1,22 +1,5 @@
 [
   {
-    "title": "Grupo Primo",
-    "slug": "grupo-primo-evioua",
-    "body": "Follow @thiago.nigro on Instagram",
-    "createdAt": "2021-08-21T05:17:47.234Z",
-    "updatedAt": "2021-08-21T05:17:47.234Z",
-    "tagList": [],
-    "description": "Best investment and entrepreneur content",
-    "author": {
-      "username": "Grupo Primo",
-      "bio": null,
-      "image": "https://static.productionready.io/images/smiley-cyrus.jpg",
-      "following": false
-    },
-    "favorited": false,
-    "favoritesCount": 0
-  },
-  {
     "title": "Article created by Cypress test",
     "slug": "article-created-by-cypress-test-64in9i",
     "body": "This article is created with Cypress. See code here: https://github.com/helenanull/cypress-example",
@@ -31,7 +14,7 @@
       "following": false
     },
     "favorited": false,
-    "favoritesCount": 0
+    "favoritesCount": 12
   },
   {
     "title": "Article created by Cypress test",

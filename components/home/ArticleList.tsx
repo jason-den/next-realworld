@@ -5,8 +5,8 @@ import { Article } from 'types';
 
 export const ArticleList = ({ articles }: { articles: Article[] }) => {
   const toggleFavorite = (article: Article) => {
-    // get the current user
-    console.log(article);
+    const newStatus = !article.favorited;
+    // API. article favorite to newStatus
   };
 
   return (

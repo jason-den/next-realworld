@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FeedToggle, DefaultFeedTypes } from 'components/home/FeedToggle';
 import { Pagination } from 'components/home/Pagination';
 import { ArticleList } from 'components/home/ArticleList';
-import sample_articles from './articles.json';
+import sample_articles from 'lib/articles.json';
 import { TagsView } from 'components/home/TagsView';
 import { Article } from 'types';
 

@@ -1,0 +1,32 @@
+
+// api file update
+interface APIResponse {
+  data?: any;
+  errors?: any[];
+  status?: number;
+}
+
+// interface Auth {
+//   login: (email: string, password: string) => Promise<APIResponse>;
+// }
+
+const Auth = {
+  login: async (email: string, password: string) => {
+    let user = undefined;
+
+    try {
+      const { data, status } = await axios.post(
+        `${BASE_URL}/users/login`,
+        { user: { email, password } },
+        { headers: { 'Access-Control-Allow-Origin': '*' } }
+      );
+      if (status == 200 && data?.user) {
+        window.localStorage.setItem('user', JSON.stringify(data.user));
+        mutate('user', data.user);
+        return { data: data!.user, status };
+      }
+      return { errors: ['Failed to login'] };
+    } catch (error) {
+      return { errors: [error] };
+    }
+  },
