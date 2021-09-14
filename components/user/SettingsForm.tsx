@@ -3,7 +3,7 @@ import Router from 'next/router';
 import { UserInfo } from 'types';
 import { Auth } from 'lib/api';
 import { ErrorsList } from 'components/common/ErrorsList';
-import { FormErrors } from 'types';
+import { Errors } from 'types';
 
 export function SettingsForm() {
   const [userInfo, setUserInfo] = React.useState<UserInfo>({
@@ -21,7 +21,7 @@ export function SettingsForm() {
   }, []);
 
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = React.useState<FormErrors>({});
+  const [errors, setErrors] = React.useState<Errors>({});
 
   const onSubmit = async (e: any) => {
     e.preventDefault();
