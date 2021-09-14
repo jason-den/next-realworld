@@ -1,28 +1,71 @@
-export type FormErrors = {
+export type Errors = {
   [key: string]: string[];
 };
+
 export type UserInfo = {
-  image?: string;
   username: string;
+  image?: string;
+  token?: string;
   bio?: string;
   email: string;
   password?: string;
 };
 
+export type Profile = {
+  username: string;
+  bio: string;
+  image: string;
+  following: boolean;
+};
+
+export type Author = {
+  username: string;
+  bio?: string;
+  image: string;
+  following: false;
+};
+
+export type ArticleDataForCreate = {
+  title: string;
+  description: string;
+  body: string;
+  tagList?: string[];
+};
+export type ArticleDataForUpdate = {
+  title?: string;
+  description?: string;
+  body?: string;
+  // tagList?: string[]; // seems not providing such feature
+};
+
+// Article JSON object from server
 export type Article = {
   title: string;
   slug: string;
   body: string;
   createdAt: string; //'2021-08-21T05:17:47.234Z'
   updatedAt: string; //'2021-08-21T05:17:47.234Z'
-  tagList: [];
+  tagList: string[];
   description: string;
-  author: {
-    username: string;
-    bio?: string;
-    image: string;
-    following: false;
-  };
-  favorited: false;
-  favoritesCount: 0;
+  author: Author;
+  favorited: boolean;
+  favoritesCount: number;
 };
+
+export type ArticleCollection = {
+  articles: Article[];
+  articlesCount: number;
+};
+
+export type CommentDataForCreate = {
+  body: string;
+};
+export type Comment = {
+  id: number;
+  createdAt: string; //'2016-02-18T03:22:56.637Z';
+  updatedAt: string; //'2016-02-18T03:22:56.637Z';
+  body: string; //'It takes a Jacobian';
+  author: Author;
+};
+export type Comments = Comment[];
+export type Tags = string[];
