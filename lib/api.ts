@@ -20,6 +20,13 @@ type BaseResponse = {
   status?: number;
 };
 
+type GetArticlesParams = {
+  tag?: string;
+  author?: string;
+  favorited?: string;
+  limit?: number;
+  offset?: number;
+};
 type Endpoints = {
   getProfile: (username: string) => Promise<BaseResponse & { profile?: Profile }>;
   followUser: (username: string) => Promise<BaseResponse & { profile?: Profile }>;
@@ -28,13 +35,7 @@ type Endpoints = {
   createArticle: (article: ArticleDataForCreate) => Promise<BaseResponse & { article?: Article }>;
   updateArticle: (article: ArticleDataForUpdate) => Promise<BaseResponse & { article?: Article }>;
   deleteArticle: (slug: string) => Promise<BaseResponse>;
-  getArticles: (
-    tag?: string,
-    author?: string,
-    favorited?: string,
-    limit?: number,
-    offset?: number,
-  ) => Promise<BaseResponse & { articleCollection?: ArticleCollection }>;
+  getArticles: (params: GetArticlesParams) => Promise<BaseResponse & { articleCollection?: ArticleCollection }>;
   feedArticles: (limit?: number, offset?: number) => Promise<BaseResponse & { articleCollection?: ArticleCollection }>;
 
   creatComment: (articleSlug: string, comment: Comment) => Promise<BaseResponse & { comment?: Comment }>;
@@ -58,7 +59,6 @@ const getProfile: Endpoints['getProfile'] = async (username) => {
       headers: { 'Access-Control-Allow-Origin': '*' },
     });
     if (status == 200) {
-      console.log(data);
       const profile: Profile = data.profile;
       return { data, status, profile };
     } else return { errors: { message: ['Fail to get profile'] }, data, status };
@@ -68,19 +68,43 @@ const getProfile: Endpoints['getProfile'] = async (username) => {
 };
 
 /* 
-DELETE /api/profiles/:username/follow
-Authentication required, returns a Profile
-*/
-const unfollowUser: Endpoints['unfollowUser'] = async (username) => {
-  return {};
-};
-
-/* 
 POST /api/profiles/:username/follow 
 Authentication required, returns a Profile 
 */
 const followUser: Endpoints['followUser'] = async (username) => {
-  return {};
+  try {
+    const currentUser: any = JSON.parse(window.localStorage.getItem('user')!);
+    const token = currentUser!.token;
+    const { data, status } = await axios.post(
+      `${BASE_URL}/profiles/${username}/follow`,
+      {},
+      { headers: { Authorization: `Token ${encodeURIComponent(token)}`, 'Access-Control-Allow-Origin': '*' } },
+    );
+    const { profile } = data;
+    return { profile, status, data };
+  } catch (error) {
+    console.log(error);
+    return { errors: { msg: ['failed to follow user - ' + (error as any)?.message] } };
+  }
+};
+
+/* 
+DELETE /api/profiles/:username/follow
+Authentication required, returns a Profile
+*/
+const unfollowUser: Endpoints['unfollowUser'] = async (username) => {
+  try {
+    const currentUser: any = JSON.parse(window.localStorage.getItem('user')!);
+    const token = currentUser!.token;
+    const { data, status } = await axios.delete(`${BASE_URL}/profiles/${username}/follow`, {
+      headers: { Authorization: `Token ${encodeURIComponent(token)}`, 'Access-Control-Allow-Origin': '*' },
+    });
+    const { profile } = data;
+    return { profile, status, data };
+  } catch (error) {
+    console.log(error);
+    return { errors: { msg: ['failed to unfollow user - ' + (error as any)?.message] } };
+  }
 };
 
 /*
@@ -121,8 +145,15 @@ Favorited by user: ?favorited=jake
 Limit number of articles (default is 20): ?limit=20
 Offset/skip number of articles (default is 0): ?offset=0
 */
-const getArticles: Endpoints['getArticles'] = async () => {
-  return {};
+
+const getArticles: Endpoints['getArticles'] = async (params) => {
+  try {
+    const { data, status } = await axios.get(`${BASE_URL}/articles`, { params });
+    return { articleCollection: data, status };
+  } catch (error) {
+    console.log({ getArticlesError: error });
+    return { errors: { msg: ['getArticlesError - ' + (error as any)?.message] } };
+  }
 };
 /*
 GET /api/articles/feed
@@ -233,8 +264,6 @@ export const Auth = {
       );
 
       if (status == 200) {
-        console.log('updated; user:', data.user);
-
         window.localStorage.setItem('user', JSON.stringify(data.user));
         mutate('user', data.user);
         return { user: data!.user, status };
