@@ -58,7 +58,6 @@ const getProfile: Endpoints['getProfile'] = async (username) => {
       headers: { 'Access-Control-Allow-Origin': '*' },
     });
     if (status == 200) {
-      console.log(data);
       const profile: Profile = data.profile;
       return { data, status, profile };
     } else return { errors: { message: ['Fail to get profile'] }, data, status };
@@ -68,19 +67,43 @@ const getProfile: Endpoints['getProfile'] = async (username) => {
 };
 
 /* 
-DELETE /api/profiles/:username/follow
-Authentication required, returns a Profile
-*/
-const unfollowUser: Endpoints['unfollowUser'] = async (username) => {
-  return {};
-};
-
-/* 
 POST /api/profiles/:username/follow 
 Authentication required, returns a Profile 
 */
 const followUser: Endpoints['followUser'] = async (username) => {
-  return {};
+  try {
+    const currentUser: any = JSON.parse(window.localStorage.getItem('user')!);
+    const token = currentUser!.token;
+    const { data, status } = await axios.post(
+      `${BASE_URL}/profiles/${username}/follow`,
+      {},
+      { headers: { Authorization: `Token ${encodeURIComponent(token)}`, 'Access-Control-Allow-Origin': '*' } },
+    );
+    const { profile } = data;
+    return { profile, status, data };
+  } catch (error) {
+    console.log(error);
+    return { errors: { msg: ['failed to follow user - ' + (error as any)?.message] } };
+  }
+};
+
+/* 
+DELETE /api/profiles/:username/follow
+Authentication required, returns a Profile
+*/
+const unfollowUser: Endpoints['unfollowUser'] = async (username) => {
+  try {
+    const currentUser: any = JSON.parse(window.localStorage.getItem('user')!);
+    const token = currentUser!.token;
+    const { data, status } = await axios.delete(`${BASE_URL}/profiles/${username}/follow`, {
+      headers: { Authorization: `Token ${encodeURIComponent(token)}`, 'Access-Control-Allow-Origin': '*' },
+    });
+    const { profile } = data;
+    return { profile, status, data };
+  } catch (error) {
+    console.log(error);
+    return { errors: { msg: ['failed to unfollow user - ' + (error as any)?.message] } };
+  }
 };
 
 /*
@@ -233,8 +256,6 @@ export const Auth = {
       );
 
       if (status == 200) {
-        console.log('updated; user:', data.user);
-
         window.localStorage.setItem('user', JSON.stringify(data.user));
         mutate('user', data.user);
         return { user: data!.user, status };
