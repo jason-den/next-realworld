@@ -74,8 +74,8 @@ export default function Page() {
 
   /** @todo display errors on UI */
   const onPostComment = async (e: any) => {
-    if (!article || commentBody.length === 0) return;
     e.preventDefault();
+    if (!article || commentBody.length === 0) return;
 
     const { comment, data, errors, status } = await API.creatComment(article?.slug, { body: commentBody });
     if (comment) {
