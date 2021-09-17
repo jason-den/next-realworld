@@ -1,14 +1,17 @@
-/*
+/**
 API Spec https://github.com/gothinkster/realworld/tree/main/api
 */
 import axios from 'axios';
 import { BASE_URL } from 'lib/utils/constants';
 import { mutate } from 'swr';
+
 import {
   Errors,
   UserInfo,
   Profile,
   Article,
+  Comment,
+  CommentDataForCreate,
   ArticleDataForCreate,
   ArticleDataForUpdate,
   ArticleCollection,
@@ -33,12 +36,12 @@ type Endpoints = {
   unfollowUser: (username: string) => Promise<BaseResponse & { profile?: Profile }>;
   getArticle: (slug: string) => Promise<BaseResponse & { article?: Article }>;
   createArticle: (article: ArticleDataForCreate) => Promise<BaseResponse & { article?: Article }>;
-  updateArticle: (article: ArticleDataForUpdate) => Promise<BaseResponse & { article?: Article }>;
+  updateArticle: (slug: string, article: ArticleDataForUpdate) => Promise<BaseResponse & { article?: Article }>;
   deleteArticle: (slug: string) => Promise<BaseResponse>;
   getArticles: (params: GetArticlesParams) => Promise<BaseResponse & { articleCollection?: ArticleCollection }>;
   feedArticles: (limit?: number, offset?: number) => Promise<BaseResponse & { articleCollection?: ArticleCollection }>;
 
-  creatComment: (articleSlug: string, comment: Comment) => Promise<BaseResponse & { comment?: Comment }>;
+  creatComment: (articleSlug: string, comment: CommentDataForCreate) => Promise<BaseResponse & { comment?: Comment }>;
   deleteComment: (slug: string, id: string) => Promise<BaseResponse>;
   getCommentsFromArticle: (articleSlug: string) => Promise<BaseResponse & { comments?: Comment[] }>;
   favoriteArticle: (slug: string) => Promise<BaseResponse & { article?: Article }>;
@@ -46,18 +49,26 @@ type Endpoints = {
   getTags: () => Promise<BaseResponse & { tags?: string[] }>;
 };
 
-/* 
+const getBaseConfig = () => ({ headers: { 'Access-Control-Allow-Origin': '*' } });
+/***
+ * @throws error when "window.localStorage.getItem('user')" is undefined.
+ */
+const getAuthorizedConfig = () => {
+  const currentUser: any = JSON.parse(window.localStorage.getItem('user')!);
+  const token = currentUser!.token;
+  return { headers: { Authorization: `Token ${encodeURIComponent(token)}`, 'Access-Control-Allow-Origin': '*' } };
+};
+
+/** 
 GET /api/profiles/:username
 Authentication optional, returns a Profile 
 */
 const getProfile: Endpoints['getProfile'] = async (username) => {
-  if (typeof username != 'string' || username.length == 0) {
+  if (typeof username != 'string' || username.length == 0)
     return { errors: { username: ['username cannot be empty'] } };
-  }
+
   try {
-    const { data, status } = await axios.get(`${BASE_URL}/profiles/${username}`, {
-      headers: { 'Access-Control-Allow-Origin': '*' },
-    });
+    const { data, status } = await axios.get(`${BASE_URL}/profiles/${username}`, getBaseConfig());
     if (status == 200) {
       const profile: Profile = data.profile;
       return { data, status, profile };
@@ -67,75 +78,90 @@ const getProfile: Endpoints['getProfile'] = async (username) => {
   }
 };
 
-/* 
+/** 
 POST /api/profiles/:username/follow 
 Authentication required, returns a Profile 
 */
 const followUser: Endpoints['followUser'] = async (username) => {
   try {
-    const currentUser: any = JSON.parse(window.localStorage.getItem('user')!);
-    const token = currentUser!.token;
-    const { data, status } = await axios.post(
-      `${BASE_URL}/profiles/${username}/follow`,
-      {},
-      { headers: { Authorization: `Token ${encodeURIComponent(token)}`, 'Access-Control-Allow-Origin': '*' } },
-    );
-    const { profile } = data;
-    return { profile, status, data };
+    const { data, status } = await axios.post(`${BASE_URL}/profiles/${username}/follow`, {}, getAuthorizedConfig());
+    return { profile: data.profile, status, data };
   } catch (error) {
-    console.log(error);
-    return { errors: { msg: ['failed to follow user - ' + (error as any)?.message] } };
+    return { errors: { msg: ['followUser - ' + (error as any)?.message, JSON.stringify(error)] } };
   }
 };
 
-/* 
+/** 
 DELETE /api/profiles/:username/follow
 Authentication required, returns a Profile
 */
 const unfollowUser: Endpoints['unfollowUser'] = async (username) => {
   try {
-    const currentUser: any = JSON.parse(window.localStorage.getItem('user')!);
-    const token = currentUser!.token;
-    const { data, status } = await axios.delete(`${BASE_URL}/profiles/${username}/follow`, {
-      headers: { Authorization: `Token ${encodeURIComponent(token)}`, 'Access-Control-Allow-Origin': '*' },
-    });
-    const { profile } = data;
-    return { profile, status, data };
+    const { data, status } = await axios.delete(`${BASE_URL}/profiles/${username}/follow`, getAuthorizedConfig());
+    return { profile: data.profile, status, data };
   } catch (error) {
-    console.log(error);
-    return { errors: { msg: ['failed to unfollow user - ' + (error as any)?.message] } };
+    return { errors: { msg: ['unfollowUser - ' + (error as any)?.message, JSON.stringify(error)] } };
   }
 };
 
-/*
+/**
 GET /api/articles/:slug
 No authentication required, will return single article
 */
 const getArticle: Endpoints['getArticle'] = async (slug) => {
-  return {};
+  try {
+    const { data, status } = await axios.get(`${BASE_URL}/articles/${slug}`, getBaseConfig());
+    return { article: data.article, data, status };
+  } catch (error) {
+    return { errors: { msg: ['getArticle - ' + (error as any)?.message, JSON.stringify(error)] } };
+  }
 };
+/**
+ * POST /api/articles
+ * Authentication required, will return an Article
+ * @todo test
+ */
 const createArticle: Endpoints['createArticle'] = async (article) => {
-  return {};
+  try {
+    const { data, status } = await axios.post(`${BASE_URL}/articles`, article, getAuthorizedConfig());
+    return { article: data.article as Article, data, status };
+  } catch (error) {
+    return { errors: { msg: ['createArticle - ' + (error as any)?.message, JSON.stringify(error)] } };
+  }
 };
 
-/*
+/**
 PUT /api/articles/:slug
 Authentication required, returns the updated Article
 Optional fields: title, description, body
 The slug also gets updated when the title is changed
+* @todo test
 */
-const updateArticle: Endpoints['updateArticle'] = async (article) => {
-  return {};
+const updateArticle: Endpoints['updateArticle'] = async (slug, article) => {
+  try {
+    const { data, status } = await axios.put(`${BASE_URL}/articles/${slug}`, article, getAuthorizedConfig());
+    return { article: data.article as Article, data, status };
+  } catch (error) {
+    return { errors: { msg: ['updateArticle - ' + (error as any)?.message, JSON.stringify(error)] } };
+  }
 };
-/*
+
+/**
 Delete Article
 DELETE /api/articles/:slug
 Authentication required
+* @todo test
 */
 const deleteArticle: Endpoints['deleteArticle'] = async (slug) => {
-  return {};
+  try {
+    const { data, status } = await axios.delete(`${BASE_URL}/articles/${slug}`, getAuthorizedConfig());
+    return { data, status };
+  } catch (error) {
+    return { errors: { msg: ['deleteArticle - ' + (error as any)?.message, JSON.stringify(error)] } };
+  }
 };
-/* 
+
+/** 
 GET /api/articles
 Authentication optional, will return multiple articles, ordered by most recent first, provides query parameter
 
@@ -145,69 +171,116 @@ Favorited by user: ?favorited=jake
 Limit number of articles (default is 20): ?limit=20
 Offset/skip number of articles (default is 0): ?offset=0
 */
-
 const getArticles: Endpoints['getArticles'] = async (params) => {
   try {
     const { data, status } = await axios.get(`${BASE_URL}/articles`, { params });
     return { articleCollection: data, status };
   } catch (error) {
-    console.log({ getArticlesError: error });
-    return { errors: { msg: ['getArticlesError - ' + (error as any)?.message] } };
+    return { errors: { msg: ['getArticlesError - ' + (error as any)?.message, JSON.stringify(error)] } };
   }
 };
-/*
+
+/**
 GET /api/articles/feed
 Can also take limit and offset query parameters like List Articles
 Authentication required, will return multiple articles created by followed users, ordered by most recent first.
+* @todo test
 */
-const feedArticles: Endpoints['feedArticles'] = async () => {
-  return {};
+const feedArticles: Endpoints['feedArticles'] = async (limit, offset) => {
+  try {
+    const { data, status } = await axios.get(`${BASE_URL}/articles/feed`, {
+      params: { limit, offset },
+      ...getAuthorizedConfig(),
+    });
+    return { articleCollection: data, data, status };
+  } catch (error) {
+    return { errors: { msg: ['feedArticles - ' + (error as any)?.message, JSON.stringify(error)] } };
+  }
 };
 
-/*
+/**
 POST /api/articles/:slug/comments
 Authentication required, returns the created Comment
 */
 const creatComment: Endpoints['creatComment'] = async (slug, comment) => {
-  return {};
+  try {
+    currentUser: any = JSON.parse(window.localStorage.getItem('user')!);
+    const token = currentUser!.token;
+    const { data, status } = await axios.post(`${BASE_URL}/articles/${slug}/comments`, comment, {
+      headers: { Authorization: `Token ${encodeURIComponent(token)}`, 'Access-Control-Allow-Origin': '*' },
+    });
+    return { comment: data.comment as Comment, status, data };
+  } catch (error) {
+    return { errors: { msg: ['creatComment - ' + (error as any)?.message, JSON.stringify(error)] } };
+  }
 };
-/*
+
+/**
 DELETE /api/articles/:slug/comments/:id
 Authentication required
 */
 const deleteComment: Endpoints['deleteComment'] = async (slug, id) => {
-  return {};
+  try {
+    const { data, status } = await axios.delete(`${BASE_URL}/articles/${slug}/comments/${id}`, getAuthorizedConfig());
+    return { data, status };
+  } catch (error) {
+    return { errors: { msg: ['creatComment - ' + (error as any)?.message, JSON.stringify(error)] } };
+  }
 };
 
-/*
+/**
 GET /api/articles/:slug/comments
 Authentication optional, returns multiple comments
 */
 const getCommentsFromArticle: Endpoints['getCommentsFromArticle'] = async (slug) => {
-  return {};
+  try {
+    const { data, status } = await axios.get(`${BASE_URL}/articles/${slug}/comments`, getBaseConfig());
+    return { comments: data.comments, data, status };
+  } catch (error) {
+    return { errors: { msg: ['getCommentsFromArticle - ' + (error as any)?.message, JSON.stringify(error)] } };
+  }
 };
 
-/*
+/**
 POST /api/articles/:slug/favorite
 Authentication required, returns the Article
+* @todo test
 */
 const favoriteArticle: Endpoints['favoriteArticle'] = async (slug) => {
-  return {};
+  try {
+    const { data, status } = await axios.post(`${BASE_URL}/articles/${slug}/favorite`, {}, getAuthorizedConfig());
+    return { article: data.article as Article, data, status };
+  } catch (error) {
+    return { errors: { msg: ['favoriteArticle - ' + (error as any)?.message, JSON.stringify(error)] } };
+  }
 };
-/*
+
+/**
 DELETE /api/articles/:slug/favorite
 Authentication required, returns the Article
+* @todo test
 */
-
 const unfavoriteArticle: Endpoints['unfavoriteArticle'] = async (slug) => {
-  return {};
+  try {
+    const { data, status } = await axios.delete(`${BASE_URL}/articles/${slug}/favorite`, getAuthorizedConfig());
+    return { data, status };
+  } catch (error) {
+    return { errors: { msg: ['unfavoriteArticle - ' + (error as any)?.message, JSON.stringify(error)] } };
+  }
 };
-/*
+
+/**
 GET /api/tags
 No authentication required, returns a List of Tags
+* @todo test
 */
 const getTags: Endpoints['getTags'] = async () => {
-  return {};
+  try {
+    const { data, status } = await axios.get(`${BASE_URL}/tags`);
+    return { tags: data.tags, data, status };
+  } catch (error) {
+    return { errors: { msg: ['getTags - ' + (error as any)?.message, JSON.stringify(error)] } };
+  }
 };
 
 interface Auth {
@@ -222,7 +295,7 @@ export const Auth = {
       const { data, status } = await axios.post(
         `${BASE_URL}/users/login`,
         { user: { email, password } },
-        { headers: { 'Access-Control-Allow-Origin': '*' } },
+        getBaseConfig(),
       );
       if (status == 200 && data?.user) {
         window.localStorage.setItem('user', JSON.stringify(data.user));
@@ -241,7 +314,7 @@ export const Auth = {
       const { data, status } = await axios.post(
         `${BASE_URL}/users`,
         { user: { username, email, password } },
-        { headers: { 'Access-Control-Allow-Origin': '*' } },
+        getBaseConfig(),
       );
       if (status == 200) {
         window.localStorage.setItem('user', JSON.stringify(data.user));
@@ -255,14 +328,7 @@ export const Auth = {
   },
   save: async (user: UserInfo) => {
     try {
-      const currentUser: any = JSON.parse(window.localStorage.getItem('user')!);
-      const token = currentUser!.token;
-      const { data, status } = await axios.put(
-        `${BASE_URL}/user`,
-        { user },
-        { headers: { Authorization: `Token ${encodeURIComponent(token)}`, 'Access-Control-Allow-Origin': '*' } },
-      );
-
+      const { data, status } = await axios.put(`${BASE_URL}/user`, { user }, getAuthorizedConfig());
       if (status == 200) {
         window.localStorage.setItem('user', JSON.stringify(data.user));
         mutate('user', data.user);

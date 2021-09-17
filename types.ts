@@ -25,6 +25,7 @@ export type Author = {
   following: false;
 };
 
+// Article object for creation
 export type ArticleDataForCreate = {
   title: string;
   description: string;
@@ -67,5 +68,4 @@ export type Comment = {
   body: string; //'It takes a Jacobian';
   author: Author;
 };
-export type Comments = Comment[];
 export type Tags = string[];
