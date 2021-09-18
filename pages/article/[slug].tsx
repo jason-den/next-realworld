@@ -1,9 +1,9 @@
 /** 
-- Article page (URL: /#/article/article-slug-here )
-  - Delete article button (only shown to article's author)
+  - Article page (URL: /#/article/article-slug-here )
   - Render markdown from server client side
   - Comments section at bottom of page
-  - Delete comment button (only shown to comment's author)
+  - @todo Delete article button (only shown to article's author)
+  - @todo Delete comment button (only shown to comment's author)
   
   * @todo study - scenario React re-rendering on state update (partially update content)
   e.g setArticle({ ...article!, author: profile })
@@ -119,9 +119,7 @@ export default function Page() {
       </Link>
       <div className="info">
         <Link href={`/profile/${article?.author.username}`} passHref>
-          <a href="" className="author">
-            {article?.author?.username || constants.PLACEHOLDER_USERNAME}
-          </a>
+          <a className="author">{article?.author?.username || constants.PLACEHOLDER_USERNAME}</a>
         </Link>
         <span className="date">{article?.createdAt}</span>
       </div>
