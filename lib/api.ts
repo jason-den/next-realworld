@@ -204,11 +204,7 @@ Authentication required, returns the created Comment
 */
 const creatComment: Endpoints['creatComment'] = async (slug, comment) => {
   try {
-    currentUser: any = JSON.parse(window.localStorage.getItem('user')!);
-    const token = currentUser!.token;
-    const { data, status } = await axios.post(`${BASE_URL}/articles/${slug}/comments`, comment, {
-      headers: { Authorization: `Token ${encodeURIComponent(token)}`, 'Access-Control-Allow-Origin': '*' },
-    });
+    const { data, status } = await axios.post(`${BASE_URL}/articles/${slug}/comments`, comment, getAuthorizedConfig());
     return { comment: data.comment as Comment, status, data };
   } catch (error) {
     return { errors: { msg: ['creatComment - ' + (error as any)?.message, JSON.stringify(error)] } };
