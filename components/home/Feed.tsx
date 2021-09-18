@@ -1,21 +1,26 @@
 import React, { useState, useEffect } from 'react';
-import { FeedToggle, DefaultFeedTypes } from 'components/home/FeedToggle';
+import { FeedToggle } from 'components/home/FeedToggle';
 import { Pagination } from 'components/home/Pagination';
 import { ArticleList } from 'components/home/ArticleList';
-import sample_articles from './articles.json';
 import { TagsView } from 'components/home/TagsView';
 import { Article } from 'types';
+import { API } from 'lib/api';
 
 // TODO: fetch articles when feed changes
 export const Feed = () => {
   const [feedType, setFeedType] = useState('Global Feed');
-  useEffect(() => {
-    console.log(`TODO: feed change, start fetching data ${feedType}`);
-
-    setArticles(sample_articles as any);
-  }, [feedType]);
-
   const [articles, setArticles] = useState<Article[]>([]);
+
+  const fetchArticles = async () => {
+    if (feedType == 'Global Feed') {
+      const { articleCollection, data, errors, status } = await API.getArticles({ limit: 20 });
+      if (articleCollection) setArticles(articleCollection.articles);
+      else console.log({ data, errors, status, callee: 'Feed-fetchArticles' });
+    }
+  };
+  useEffect(() => {
+    fetchArticles();
+  }, [feedType]);
 
   let tags = ['programming', 'javascript', 'emberjs', 'angularjs', 'react', 'mean', 'node', 'rails'];
 
