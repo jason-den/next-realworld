@@ -13,18 +13,12 @@ export type UserInfo = {
 
 export type Profile = {
   username: string;
-  bio: string;
-  image: string;
+  bio?: string;
+  image?: string;
   following: boolean;
 };
 
-export type Author = {
-  username: string;
-  bio?: string;
-  image: string;
-  following: false;
-};
-
+// Article object for creation
 export type ArticleDataForCreate = {
   title: string;
   description: string;
@@ -47,7 +41,7 @@ export type Article = {
   updatedAt: string; //'2021-08-21T05:17:47.234Z'
   tagList: string[];
   description: string;
-  author: Author;
+  author: Profile;
   favorited: boolean;
   favoritesCount: number;
 };
@@ -65,7 +59,6 @@ export type Comment = {
   createdAt: string; //'2016-02-18T03:22:56.637Z';
   updatedAt: string; //'2016-02-18T03:22:56.637Z';
   body: string; //'It takes a Jacobian';
-  author: Author;
+  author: Profile;
 };
-export type Comments = Comment[];
 export type Tags = string[];
